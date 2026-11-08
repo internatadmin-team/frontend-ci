@@ -1,0 +1,124 @@
+<div class="card" style="padding: 0;">
+  @if (searchable() || exportable()) {
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 border-b border-sand-200">
+      @if (searchable()) {
+        <div class="relative flex-1 max-w-sm">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-sand-400">
+            <app-icon name="search" size="w-4 h-4"></app-icon>
+          </span>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Rechercher..."
+            [value]="searchTerm()"
+            (input)="onSearchChange($any($event.target).value)"
+          >
+        </div>
+      }
+
+      @if (exportable()) {
+        <div class="flex gap-2">
+          <button type="button" class="btn-secondary text-sm" (click)="onExportCsv()">
+            <app-icon name="download" size="w-4 h-4"></app-icon>
+            Exporter Excel
+          </button>
+          <button type="button" class="btn-secondary text-sm no-print" (click)="onExportPdf()">
+            <app-icon name="download" size="w-4 h-4"></app-icon>
+            Exporter PDF
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  <div class="overflow-x-auto">
+    <table class="data-table">
+      <thead>
+        <tr>
+          @for (col of columns(); track col.key) {
+            <th
+              [class.cursor-pointer]="col.sortable"
+              [style.text-align]="col.align || 'left'"
+              (click)="onSort(col)"
+            >
+              <span class="inline-flex items-center gap-1">
+                {{ col.label }}
+                @if (col.sortable) {
+                  <app-icon
+                    [name]="sortDirection() === 'asc' ? 'chevron-up' : 'chevron-down'"
+                    size="w-3 h-3"
+                    [style.opacity]="sortKey() === col.key ? '1' : '0.3'"
+                  ></app-icon>
+                }
+              </span>
+            </th>
+          }
+          @if (actionsTemplate()) {
+            <th style="text-align: right;">Actions</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of pagedData(); track row) {
+          <tr (click)="rowClick.emit(row)" style="cursor: pointer;">
+            @for (col of columns(); track col.key) {
+              <td [style.text-align]="col.align || 'left'">{{ getCellValue(row, col) }}</td>
+            }
+            @if (actionsTemplate()) {
+              <td style="text-align: right;" (click)="$event.stopPropagation()">
+                <ng-container *ngTemplateOutlet="actionsTemplate()!; context: { $implicit: row }"></ng-container>
+              </td>
+            }
+          </tr>
+        } @empty {
+          <tr>
+            <td [attr.colspan]="columns().length + (actionsTemplate() ? 1 : 0)" class="text-center py-12 text-sand-500">
+              {{ emptyMessage() }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (totalPages() > 1) {
+    <div class="flex items-center justify-between p-4 border-t border-sand-200 text-sm text-sand-600 no-print">
+      <span>Page {{ currentPage() }} sur {{ totalPages() }} ({{ filteredData().length }} résultats)</span>
+      <div class="flex items-center gap-2">
+        <button type="button" class="btn-secondary text-sm" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">
+          <app-icon name="chevron-left" size="w-4 h-4"></app-icon>
+        </button>
+        <button type="button" class="btn-secondary text-sm" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">
+          <app-icon name="chevron-right" size="w-4 h-4"></app-icon>
+        </button>
+      </div>
+    </div>
+  }
+ <!-- Vue imprimable : n'existe dans la page que pendant l'impression -->
+@if (printing()) {
+  <div class="print-only" style="padding: 1.5rem;">
+    <app-print-header></app-print-header>
+    <h1 style="font-family: 'Poppins', sans-serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem; color: #3D3229;">
+      {{ displayTitle() }}
+    </h1>
+    <table style="width: 100%; border-collapse: collapse; font-size: 0.7rem;">
+      <thead>
+        <tr>
+          @for (col of columns(); track col.key) {
+            <th style="text-align: left; border-bottom: 2px solid #3D3229; padding: 4px 8px; color: #3D3229;">{{ col.label }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of filteredData(); track row) {
+          <tr>
+            @for (col of columns(); track col.key) {
+              <td style="border-bottom: 1px solid #E8E0D5; padding: 4px 8px; color: #3D3229;">{{ getCellValue(row, col) }}</td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+</div>

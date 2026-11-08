@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #F5F0E8; }
+      .st-sage { fill: #5B8A72; }
+      .st-slate { fill: #4A6B7C; }
+      .st-gold { fill: #C4A35A; }
+      
+      .text-main {
+        font-family: 'Poppins', 'Inter', 'Helvetica Neue', sans-serif;
+        font-weight: 700;
+        font-size: 54px;
+        fill: #4A6B7C;
+        letter-spacing: -0.5px;
+      }
+      .text-span {
+        fill: #5B8A72;
+      }
+      .text-sub {
+        font-family: 'Inter', 'Helvetica Neue', sans-serif;
+        font-weight: 500;
+        font-size: 16px;
+        fill: #C4A35A;
+        letter-spacing: 4px;
+      }
+    </style>
+  </defs>
+
+  <rect width="100%" height="100%" class="bg" />
+
+  <g transform="translate(40, 0)">
+    <g transform="translate(100, 110)">
+      
+      <path d="M 10,130 L 170,130 L 170,140 L 10,140 Z" class="st-slate" />
+      <path d="M 25,75 L 25,130 L 37,130 L 37,75 Z" class="st-slate" />
+      <path d="M 143,75 L 143,130 L 155,130 L 155,75 Z" class="st-slate" />
+      
+      <path d="M 15,65 L 90,25 L 165,65 L 150,65 L 90,33 L 30,65 Z" class="st-sage" />
+      <path d="M 52,65 L 52,130 L 64,130 L 64,65 Z" class="st-sage" />
+      <path d="M 116,65 L 116,130 L 128,130 L 128,65 Z" class="st-sage" />
+
+      <path d="M 90,115 C 78,102 55,100 45,102 L 45,77 C 55,75 78,77 90,90 C 102,77 125,75 135,77 L 135,102 C 125,100 102,102 90,115 Z" class="st-gold" />
+      <rect x="88" y="90" width="4" height="26" class="st-gold" />
+
+      <path d="M 90,52 C 95.5,52 100,56.5 100,62 C 100,65.5 98.2,68.5 95.5,70.5 C 98.5,69.5 101,66.5 101,62 C 101,55.5 95.5,50 89,50 C 86.5,50 84.2,50.8 82.2,52.2 C 84.5,51 87,52 90,52 Z" class="st-gold" />
+      
+    </g>
+
+    <g transform="translate(320, 205)">
+      <text class="text-main">Internat<tspan class="text-span">Admin</tspan></text>
+      
+      <text y="42" x="4" class="text-sub">GESTION &amp; ÉDUCATION</text>
+    </g>
+  </g>
+</svg>

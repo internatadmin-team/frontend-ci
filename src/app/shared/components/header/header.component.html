@@ -1,0 +1,91 @@
+<header style="position: sticky; top: 0; z-index: 30; background: rgba(251,248,243,0.8); backdrop-filter: blur(12px); border-bottom: 1px solid #E8E0D5; height: 64px;">
+  <div class="flex items-center justify-between h-full px-4 lg:px-6">
+    <!-- Left -->
+    <div class="flex items-center gap-4">
+      <button
+        (click)="onToggleSidebar()"
+        class="p-2 rounded-lg text-[#7A6F65] hover:bg-[#F5F0E8] transition-colors"
+      >
+        <app-icon name="menu" size="w-5 h-5"></app-icon>
+      </button>
+
+      <h2 style="font-size: 1.125rem; font-weight: 600; color: #3D3229; font-family: 'Poppins', sans-serif;" class="hidden sm:block">
+        Tableau de bord
+      </h2>
+    </div>
+
+    <!-- Right -->
+    <div class="flex items-center gap-3">
+      <!-- Notifications -->
+      <div class="relative">
+        <button
+          (click)="togglePanel()"
+          class="relative p-2 rounded-lg text-[#7A6F65] hover:bg-[#F5F0E8] transition-colors"
+        >
+          <app-icon name="bell" size="w-5 h-5"></app-icon>
+          @if (totalCount() > 0) {
+            <span class="absolute top-1 right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#B8704B] text-white text-[10px] font-semibold flex items-center justify-center">
+              {{ totalCount() > 9 ? '9+' : totalCount() }}
+            </span>
+          }
+        </button>
+
+        @if (panelOpen()) {
+          <!-- Zone invisible pour fermer au clic extérieur -->
+          <div class="fixed inset-0 z-40" (click)="closePanel()"></div>
+
+          <div
+            class="absolute right-0 top-full mt-2 w-80 max-w-[90vw] rounded-xl shadow-lg border border-sand-200 bg-[#FBF8F3] z-50 overflow-hidden"
+            (click)="$event.stopPropagation()"
+          >
+            <div class="px-4 py-3 border-b border-sand-200">
+              <h3 class="text-sm font-semibold text-sand-800">Alertes et notifications</h3>
+            </div>
+
+            <div class="max-h-96 overflow-y-auto">
+              @if (notificationsLoading()) {
+                <div class="py-8 text-center text-sand-400 text-sm">Chargement...</div>
+              } @else if (notifications().length === 0) {
+                <div class="flex flex-col items-center justify-center py-10 text-center px-4">
+                  <div class="w-12 h-12 bg-sage-100 rounded-full flex items-center justify-center mb-3">
+                    <app-icon name="check-circle" size="w-6 h-6 text-sage-500"></app-icon>
+                  </div>
+                  <p class="text-sm font-medium text-sand-700">Tout est à jour</p>
+                  <p class="text-xs text-sand-500 mt-1">Aucune alerte pour le moment</p>
+                </div>
+              } @else {
+                <ul class="divide-y divide-sand-200">
+                  @for (notif of notifications(); track notif.type) {
+                    <li class="flex items-start gap-3 px-4 py-3">
+                      <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                           [class]="severityVariant(notif.severity) === 'error' ? 'bg-earth-100 text-earth-600' :
+                                    severityVariant(notif.severity) === 'warning' ? 'bg-terracotta-100 text-terracotta-600' :
+                                    'bg-slate-100 text-slate-600'">
+                        <app-icon [name]="severityIcon(notif.severity)" size="w-4 h-4"></app-icon>
+                      </div>
+                      <p class="text-sm text-sand-700 flex-1">{{ notif.message }}</p>
+                      @if (notif.count > 1) {
+                        <span class="status-badge neutral">{{ notif.count }}</span>
+                      }
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Profile -->
+      <div class="flex items-center gap-3 pl-3 border-l border-[#E8E0D5]">
+        <div class="text-right hidden md:block">
+          <p style="font-size: 0.875rem; font-weight: 500; color: #3D3229;">{{ (user | async)?.fullName }}</p>
+          <p style="font-size: 0.75rem; color: #9C8B6E;">{{ (user | async)?.role }}</p>
+        </div>
+        <div class="w-9 h-9 rounded-full bg-[#D4E5D9] flex items-center justify-center overflow-hidden">
+          <app-icon name="user" size="w-5 h-5" style="color: #5B8A72;"></app-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

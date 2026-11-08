@@ -1,0 +1,70 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="form-label">Prénom</label>
+      <input type="text" formControlName="firstName" class="input-field" [class.error]="submitted() && form.get('firstName')?.invalid">
+      @if (submitted() && form.get('firstName')?.invalid) {
+        <span class="form-error">Le prénom est requis</span>
+      }
+    </div>
+    <div>
+      <label class="form-label">Nom</label>
+      <input type="text" formControlName="lastName" class="input-field" [class.error]="submitted() && form.get('lastName')?.invalid">
+      @if (submitted() && form.get('lastName')?.invalid) {
+        <span class="form-error">Le nom est requis</span>
+      }
+    </div>
+  </div>
+
+  <div>
+    <label class="form-label">Téléphone</label>
+    <input type="tel" formControlName="phone" class="input-field" [class.error]="submitted() && form.get('phone')?.invalid">
+    @if (submitted() && form.get('phone')?.invalid) {
+      <span class="form-error">Le téléphone est requis</span>
+    }
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="form-label">Fonction</label>
+      <select formControlName="function" class="input-field">
+        @for (option of functionOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+    <div>
+      <label class="form-label">Type de contrat</label>
+      <select formControlName="contractType" class="input-field">
+        @for (option of contractTypeOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="form-label">Salaire de base (FCFA)</label>
+      <input type="number" formControlName="baseSalary" class="input-field" min="0">
+    </div>
+
+    @if (!isEditMode) {
+      <div>
+        <label class="form-label">Date d'embauche</label>
+        <input type="date" formControlName="hireDate" class="input-field" [class.error]="submitted() && form.get('hireDate')?.invalid">
+        @if (submitted() && form.get('hireDate')?.invalid) {
+          <span class="form-error">La date d'embauche est requise</span>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="flex justify-end gap-3 pt-2">
+    <!--<button type="button" class="btn-secondary" (click)="onCancel()">Annuler</button>-->
+    <button type="submit" class="btn-primary" [disabled]="loading()">
+      {{ loading() ? 'Enregistrement...' : (isEditMode ? 'Enregistrer les modifications' : 'Ajouter l\'employé') }}
+    </button>
+  </div>
+</form>
