@@ -1,0 +1,26 @@
+<div class="fixed bottom-6 right-6 z-[70] flex flex-col gap-3 max-w-sm w-full pointer-events-none">
+  @for (toast of toasts(); track toast.id) {
+    <div 
+      class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border transform transition-all duration-300 pointer-events-auto"
+      [class]="{
+        'bg-[#4F8A5B] text-white border-[#3D6B47]': toast.type === 'success',
+        'bg-[#A65D4D] text-white border-[#8A4A3E]': toast.type === 'error',
+        'bg-[#B8704B] text-white border-[#9A5C3C]': toast.type === 'warning',
+        'bg-[#4A6B7C] text-white border-[#3A5664]': toast.type === 'info'
+      }"
+    >
+      <div class="shrink-0">
+        <app-icon [name]="getIconName(toast.type)" size="w-5 h-5"></app-icon>
+      </div>
+      
+      <p class="text-sm font-medium flex-1">{{ toast.message }}</p>
+      
+      <button 
+        (click)="removeToast(toast.id)"
+        class="shrink-0 opacity-70 hover:opacity-100 transition-opacity"
+      >
+        <app-icon name="x" size="w-4 h-4"></app-icon>
+      </button>
+    </div>
+  }
+</div>

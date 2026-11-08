@@ -1,0 +1,110 @@
+<div class="space-y-5">
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-sm text-sand-500">Matricule</p>
+      <p class="font-mono font-medium text-sand-800">{{ employe().matricule }}</p>
+    </div>
+    <app-status-badge [status]="employe().status"></app-status-badge>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4 text-sm">
+    <div>
+      <p class="text-sand-500">Fonction</p>
+      <p class="text-sand-800 font-medium">{{ functionLabels[employe().function] }}</p>
+    </div>
+    <div>
+      <p class="text-sand-500">Type de contrat</p>
+      <p class="text-sand-800 font-medium">{{ contractTypeLabels[employe().contractType] }}</p>
+    </div>
+    <div>
+      <p class="text-sand-500">Téléphone</p>
+      <p class="text-sand-800 font-medium">{{ employe().phone }}</p>
+    </div>
+    <div>
+      <p class="text-sand-500">Date d'embauche</p>
+      <p class="text-sand-800 font-medium">{{ employe().hireDate }}</p>
+    </div>
+    <div>
+      <p class="text-sand-500">Salaire de base</p>
+      <p class="text-sand-800 font-medium">{{ employe().baseSalary }} FCFA</p>
+    </div>
+  </div>
+
+  <!-- Changer de statut -->
+  <div class="border-t border-sand-200 pt-4">
+    <p class="text-sm font-medium text-sand-700 mb-2">Changer le statut</p>
+    <div class="flex flex-wrap gap-2">
+      @for (status of otherStatuses(); track status) {
+        <button
+          type="button"
+          class="btn-secondary text-sm"
+          [disabled]="changingStatus()"
+          (click)="onChangeStatus(status)"
+        >
+          {{ statusLabels[status] }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="border-t border-sand-200 pt-4 flex flex-wrap gap-3">
+    <button type="button" class="btn-secondary" (click)="onEdit()">
+      <app-icon name="edit" size="w-4 h-4"></app-icon>
+      Modifier
+    </button>
+    <button type="button" class="btn-secondary" (click)="printCertificate()">
+      <app-icon name="download" size="w-4 h-4"></app-icon>
+      Imprimer certificat
+    </button>
+    <button type="button" class="btn-secondary" (click)="printCard()">
+      <app-icon name="download" size="w-4 h-4"></app-icon>
+      Imprimer carte
+    </button>
+  </div>
+</div>
+
+<!-- Zones imprimables -->
+@if (printMode() === 'certificat') {
+  <div class="print-only" style="padding: 2rem;">
+    <app-print-header></app-print-header>
+    <h1 style="font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 700; text-align: center; margin: 2rem 0 1.5rem; color: #3D3229;">
+      Certificat de travail
+    </h1>
+    <p style="font-size: 0.95rem; line-height: 1.7; color: #3D3229;">
+      Nous certifions que <strong>{{ employe().fullName }}</strong> (matricule {{ employe().matricule }}) occupe le poste de {{ functionLabels[employe().function] }} au sein de notre établissement depuis le {{ employe().hireDate }}.
+    </p>
+    <div style="margin-top: 4rem; text-align: right; font-size: 0.85rem; color: #3D3229;">
+      <p>Fait le {{ today }}</p>
+      <p style="margin-top: 3rem; font-weight: 600; border-top: 1px solid #3D3229; display: inline-block; padding-top: 0.4rem;">
+        Le Directeur / La Directrice
+      </p>
+    </div>
+  </div>
+}
+
+@if (printMode() === 'carte') {
+  <div class="print-only" style="padding: 2rem;">
+    <app-print-header></app-print-header>
+    <div style="width: 340px; border-radius: 16px; overflow: hidden; border: 1px solid #E8E0D5; font-family: 'Inter', sans-serif; margin-top: 1rem;">
+      <div style="background: linear-gradient(135deg, #4A6B7C, #5B8A72); padding: 1rem 1.25rem; color: white;">
+        <p style="font-size: 0.7rem; opacity: 0.85; letter-spacing: 0.05em; text-transform: uppercase; margin: 0;">Carte professionnelle</p>
+      </div>
+      <div style="padding: 1.25rem; display: flex; gap: 1rem; align-items: center;">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: #F5F0E8; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 2px solid #C4A35A;">
+          <span style="font-size: 1.4rem; font-weight: 700; color: #4A6B7C;">{{ employe().firstName.charAt(0) }}{{ employe().lastName.charAt(0) }}</span>
+        </div>
+        <div>
+          <p style="font-weight: 700; font-size: 0.95rem; color: #3D3229; margin: 0;">{{ employe().fullName }}</p>
+          <p style="font-size: 0.75rem; color: #7A6F65; font-family: monospace; margin: 0;">{{ employe().matricule }}</p>
+        </div>
+      </div>
+      <div style="padding: 0 1.25rem 1.25rem; font-size: 0.8rem; color: #5C534A;">
+        <div style="border-top: 1px dashed #E8E0D5; padding-top: 0.6rem;">
+          {{ functionLabels[employe().function] }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+}

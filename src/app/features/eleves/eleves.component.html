@@ -1,0 +1,111 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <div>
+      <h1 class="text-2xl font-bold text-sand-800 font-[family-name:var(--font-display)]">Gestion des élèves</h1>
+      <p class="text-sand-500 text-sm mt-1">Liste et gestion des élèves de l'internat</p>
+    </div>
+    <button type="button" class="btn-primary" (click)="onAddClick()">
+      <app-icon name="plus" size="w-4 h-4"></app-icon>
+      Ajouter un élève
+    </button>
+  </div>
+
+  <!-- Statistiques -->
+  @if (stats(); as s) {
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="stat-card">
+        <div class="stat-icon green"><app-icon name="baby" size="w-5 h-5"></app-icon></div>
+        <p class="stat-value">{{ s.totalActifs }}</p>
+        <p class="stat-label">Actifs</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue"><app-icon name="clipboard" size="w-5 h-5"></app-icon></div>
+        <p class="stat-value">{{ s.totalEnVacances }}</p>
+        <p class="stat-label">En vacances</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon gold"><app-icon name="trending-up" size="w-5 h-5"></app-icon></div>
+        <p class="stat-value">{{ s.nouveauxCeMois }}</p>
+        <p class="stat-label">Nouveaux ce mois</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange"><app-icon name="alert-triangle" size="w-5 h-5"></app-icon></div>
+        <p class="stat-value">{{ s.impayesCeMois }}</p>
+        <p class="stat-label">Impayés ce mois</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue"><app-icon name="log-out" size="w-5 h-5"></app-icon></div>
+        <p class="stat-value">{{ s.totalSortis }}</p>
+        <p class="stat-label">Sortis</p>
+      </div>
+    </div>
+  }
+
+  <!-- Filtres -->
+  <div class="flex gap-2 flex-wrap">
+    @for (tab of tabs; track tab.value) {
+      <button
+        type="button"
+        class="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+        [class]="activeTab() === tab.value ? 'bg-sage-500 text-white' : 'bg-sand-50 text-sand-600 border border-sand-200 hover:bg-sand-100'"
+        (click)="onTabChange(tab.value)"
+      >
+        {{ tab.label }}
+      </button>
+    }
+  </div>
+
+  <!-- Tableau -->
+  @if (loading()) {
+    <div class="card text-center py-12 text-sand-400">Chargement des élèves...</div>
+  } @else {
+   <app-data-table
+        [columns]="columns()"
+        [data]="eleves()"
+        [defaultSortKey]="'id'"
+        [defaultSortDirection]="'desc'"
+        exportFileName="eleves"
+        emptyMessage="Aucun élève trouvé"
+        (rowClick)="onRowClick($event)"
+        >
+      <ng-template #actions let-row>
+        <button
+          type="button"
+          class="p-2 rounded-lg text-sand-500 hover:bg-sand-100 transition-colors"
+          (click)="onEditClick(row)"
+          title="Modifier"
+        >
+          <app-icon name="edit" size="w-4 h-4"></app-icon>
+        </button>
+      </ng-template>
+    </app-data-table>
+  }
+</div>
+
+<!-- Modale formulaire (ajout / modification) -->
+<app-modal
+  [open]="showFormModal()"
+  [title]="editingEleve() ? 'Modifier un élève' : 'Ajouter un élève'"
+  maxWidth="42rem"
+  (closed)="showFormModal.set(false)"
+>
+  @if (showFormModal()) {
+    <app-eleve-form [eleve]="editingEleve()" (saved)="onFormSaved()" (cancelled)="showFormModal.set(false)"></app-eleve-form>
+  }
+</app-modal>
+
+<!-- Modale détails -->
+<app-modal
+  [open]="showDetailsModal()"
+  [title]="selectedEleve()?.fullName || 'Détails de l\'élève'"
+  maxWidth="36rem"
+  (closed)="showDetailsModal.set(false)"
+>
+  @if (showDetailsModal() && selectedEleve()) {
+    <app-eleve-details
+      [eleve]="selectedEleve()!"
+      (editRequested)="onEditFromDetails($event)"
+      (statusChanged)="onStatusChanged($event)"
+    ></app-eleve-details>
+  }
+</app-modal>
