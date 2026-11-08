@@ -72,8 +72,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this.scheduleExpiration(exp);
 
       if (currentUrl === '/change-password' && !payload.mustChangePassword) {
-        // NOTE T05 : '/dashboard' n'existe pas encore (arrive avec T06) ; redirection temporaire vers '/eleves'
-        this.router.navigate(['/eleves'], { replaceUrl: true });
+        this.router.navigate(['/dashboard'], { replaceUrl: true });
         return;
       }
 

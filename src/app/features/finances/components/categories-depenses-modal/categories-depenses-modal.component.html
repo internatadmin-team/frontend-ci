@@ -1,0 +1,56 @@
+<div class="space-y-5">
+  @if (loading()) {
+    <p class="text-sand-400 text-sm text-center py-6">Chargement des catégories...</p>
+  } @else {
+    <ul class="divide-y divide-sand-200 border border-sand-200 rounded-xl overflow-hidden">
+      @for (cat of categories(); track cat.id) {
+        <li class="flex items-center justify-between px-4 py-3">
+          <div>
+            <p class="text-sm font-medium text-sand-800">{{ cat.name }}</p>
+            @if (cat.description) {
+              <p class="text-xs text-sand-500">{{ cat.description }}</p>
+            }
+          </div>
+          @if (isAdmin()) {
+            <button
+              type="button"
+              class="p-2 rounded-lg text-earth-500 hover:bg-earth-50 transition-colors"
+              (click)="onDeactivate(cat)"
+              title="Désactiver"
+            >
+              <app-icon name="trash" size="w-4 h-4"></app-icon>
+            </button>
+          }
+        </li>
+      } @empty {
+        <li class="px-4 py-6 text-center text-sand-400 text-sm">Aucune catégorie active</li>
+      }
+    </ul>
+  }
+
+  @if (isAdmin()) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-3 border-t border-sand-200 pt-4">
+      <p class="text-sm font-medium text-sand-700">Ajouter une catégorie</p>
+      <div>
+        <label class="form-label">Nom</label>
+        <input type="text" formControlName="name" class="input-field" [class.error]="submitted() && form.get('name')?.invalid">
+        @if (submitted() && form.get('name')?.invalid) {
+          <span class="form-error">Le nom est requis</span>
+        }
+      </div>
+      <div>
+        <label class="form-label">Description (optionnel)</label>
+        <input type="text" formControlName="description" class="input-field">
+      </div>
+      <div class="flex justify-end">
+        <button type="submit" class="btn-primary text-sm" [disabled]="submitting()">
+          {{ submitting() ? 'Ajout...' : 'Ajouter la catégorie' }}
+        </button>
+      </div>
+    </form>
+  } @else {
+    <p class="text-xs text-sand-500 border-t border-sand-200 pt-4">
+      Seul un administrateur peut ajouter ou désactiver une catégorie.
+    </p>
+  }
+</div>

@@ -1,0 +1,146 @@
+<div class="space-y-6">
+  <!-- En-tête -->
+  <div>
+    <h1 class="text-2xl font-bold text-sand-800 font-[family-name:var(--font-display)]">Tableau de bord</h1>
+    <p class="text-sand-500 text-sm mt-1">Vue d'ensemble globale de votre internat</p>
+  </div>
+
+  <!-- Cartes statistiques -->
+  @if (loading()) {
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      @for (i of [1, 2, 3, 4, 5]; track i) {
+        <div class="card min-w-0" style="height: 120px; opacity: 0.5;"></div>
+      }
+    </div>
+  } @else {
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      @for (stat of stats(); track stat.label) {
+        <div class="card min-w-0">
+          <div class="flex items-start">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center"
+                 [class]="stat.color === 'green' ? 'bg-sage-100 text-sage-600' :
+                          stat.color === 'blue' ? 'bg-slate-100 text-slate-600' :
+                          stat.color === 'gold' ? 'bg-gold-100 text-gold-600' :
+                          'bg-terracotta-100 text-terracotta-600'">
+              <app-icon [name]="stat.icon" size="w-5 h-5"></app-icon>
+            </div>
+          </div>
+          <div class="mt-4">
+            <p [class]="getFontSize(stat.value) + ' font-bold text-sand-800 font-[family-name:var(--font-display)]'">
+              {{ stat.value }}
+            </p>
+            <p class="text-sm text-sand-500 mt-1">{{ stat.label }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Accès rapide (inchangé) -->
+  <div class="card">
+    <h3 class="text-lg font-semibold text-sand-800 mb-4">Accès rapide</h3>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      @for (item of quickAccess; track item.route) {
+        <a
+          [routerLink]="item.route"
+          class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-sand-200 hover:bg-sand-50 hover:border-sand-300 transition-colors text-center"
+        >
+          <div class="w-10 h-10 rounded-lg bg-sage-100 text-sage-600 flex items-center justify-center">
+            <app-icon [name]="item.icon" size="w-5 h-5"></app-icon>
+          </div>
+          <span class="text-sm font-medium text-sand-700">{{ item.label }}</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <!-- Widgets : impayés / dépenses / activité (inchangés) -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+    <!-- Impayés à traiter -->
+    <div class="card">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-semibold text-sand-800">Impayés à traiter</h3>
+        @if (impayesTotalCount() > 0) {
+          <span class="status-badge warning">{{ impayesTotalCount() }}</span>
+        }
+      </div>
+
+      @if (impayesLoading()) {
+        <p class="text-sand-400 text-sm text-center py-6">Chargement...</p>
+      } @else if (impayes().length === 0) {
+        <div class="flex flex-col items-center justify-center py-8 text-center">
+          <app-icon name="check-circle" size="w-8 h-8 text-sage-500 mb-2"></app-icon>
+          <p class="text-sm text-sand-500">Aucun impayé ce mois-ci</p>
+        </div>
+      } @else {
+        <ul class="divide-y divide-sand-200">
+          @for (item of impayes(); track item.enfantId) {
+            <li class="py-2 text-sm flex items-center justify-between">
+              <span class="text-sand-700">{{ item.fullName }}</span>
+              <span class="font-medium text-terracotta-600">{{ formatFcfaPublic(item.montantRestant) }}</span>
+            </li>
+          }
+        </ul>
+        <a routerLink="/paiements" class="text-sm text-sage-600 hover:underline mt-3 inline-block">Voir tout →</a>
+      }
+    </div>
+
+    <!-- Répartition des dépenses -->
+    <div class="card">
+      <h3 class="text-base font-semibold text-sand-800 mb-4">Répartition des dépenses</h3>
+
+      @if (depensesLoading()) {
+        <p class="text-sand-400 text-sm text-center py-6">Chargement...</p>
+      } @else if (depensesDetail().length === 0) {
+        <div class="flex flex-col items-center justify-center py-8 text-center">
+          <app-icon name="receipt" size="w-8 h-8 text-sand-300 mb-2"></app-icon>
+          <p class="text-sm text-sand-500">Aucune dépense ce mois-ci</p>
+        </div>
+      } @else {
+        <div class="space-y-3">
+          @for (ligne of depensesDetail(); track ligne.source) {
+            <div>
+              <div class="flex items-center justify-between text-xs mb-1">
+                <span class="text-sand-600">{{ ligne.source }}</span>
+                <span class="font-medium text-sand-700">{{ formatFcfaPublic(ligne.montant) }}</span>
+              </div>
+              <div class="h-2 rounded-full bg-sand-100 overflow-hidden">
+                <div class="h-full bg-terracotta-400 rounded-full" [style.width.%]="(ligne.montant / depensesMaxMontant()) * 100"></div>
+              </div>
+            </div>
+          }
+        </div>
+        <a routerLink="/finances" class="text-sm text-sage-600 hover:underline mt-3 inline-block">Voir la trésorerie →</a>
+      }
+    </div>
+
+    <!-- Activité récente -->
+    <div class="card">
+      <h3 class="text-base font-semibold text-sand-800 mb-4">Mon activité récente</h3>
+
+      @if (activityLoading()) {
+        <p class="text-sand-400 text-sm text-center py-6">Chargement...</p>
+      } @else if (activityLogs().length === 0) {
+        <div class="flex flex-col items-center justify-center py-8 text-center">
+          <app-icon name="clipboard" size="w-8 h-8 text-sand-300 mb-2"></app-icon>
+          <p class="text-sm text-sand-500">Aucune activité récente</p>
+        </div>
+      } @else {
+        <ul class="divide-y divide-sand-200">
+          @for (log of activityLogs(); track log.id) {
+            <li class="py-2">
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="status-badge" [class]="actionVariant(log.action)" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;">
+                  {{ actionLabel(log.action) }}
+                </span>
+                <span class="text-xs text-sand-400">{{ log.actionDate | date: 'dd/MM HH:mm' }}</span>
+              </div>
+              <p class="text-sm text-sand-700">{{ entityLabel(log.entityType) }} — {{ rowTitle(log) }}</p>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+</div>

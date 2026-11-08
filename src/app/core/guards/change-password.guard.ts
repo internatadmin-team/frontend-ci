@@ -30,8 +30,8 @@ export const changePasswordGuard: CanActivateFn = () => {
     }
 
     // Déjà changé, aller au dashboard (éviter boucle)
-    if (!router.url.includes('/eleves')) {
-      router.navigate(['/eleves'], { replaceUrl: true });
+    if (!router.url.includes('/dashboard')) {
+      router.navigate(['/dashboard'], { replaceUrl: true });
     }
     return false;
     
