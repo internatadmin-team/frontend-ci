@@ -4,9 +4,6 @@ import { changePasswordGuard } from './core/guards/change-password.guard';
 import { roleGuard } from './core/guards/role.guard';
 import { LayoutComponent } from './shared/components/layout/layout.component';
 
-// NOTE T05 : les routes dashboard / paiements / finances / audit seront
-// ajoutees par T06 (Arame) une fois ces ecrans livres. En attendant, la
-// page par defaut est "eleves".
 export const routes: Routes = [
   {
     path: 'login',
@@ -22,7 +19,11 @@ export const routes: Routes = [
     component: LayoutComponent,
     canActivate: [authGuard],
     children: [
-      { path: '', redirectTo: 'eleves', pathMatch: 'full' },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
+      },
       {
         path: 'eleves',
         loadComponent: () => import('./features/eleves/eleves.component').then(m => m.ElevesComponent)
@@ -30,6 +31,19 @@ export const routes: Routes = [
       {
         path: 'employes',
         loadComponent: () => import('./features/employes/employes.component').then(m => m.EmployesComponent)
+      },
+      {
+        path: 'paiements',
+        loadComponent: () => import('./features/paiements/paiements.component').then(m => m.PaiementsComponent)
+      },
+      {
+        path: 'finances',
+        loadComponent: () => import('./features/finances/finances.component').then(m => m.FinancesComponent)
+      },
+     {
+        path: 'audit',
+        canActivate: [roleGuard(['ADMIN'])],
+        loadComponent: () => import('./features/audit/audit.component').then(m => m.AuditComponent)
       },
       {
         path: 'users',

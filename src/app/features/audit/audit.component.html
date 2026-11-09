@@ -1,0 +1,92 @@
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold text-sand-800 font-[family-name:var(--font-display)]">Historique des opérations</h1>
+    <p class="text-sand-500 text-sm mt-1">Trace de toutes les actions effectuées dans l'application</p>
+  </div>
+
+  <!-- Filtre -->
+  <div class="card flex flex-wrap items-end gap-4">
+    <div>
+      <label class="form-label">Type d'élément concerné</label>
+      <select
+        class="input-field"
+        style="width: 14rem;"
+        (change)="onEntityTypeChange($any($event.target).value)"
+      >
+        <option value="" [selected]="entityTypeFilter() === ''">Tous</option>
+        @for (option of entityTypeOptions; track option.value) {
+          <option [value]="option.value" [selected]="entityTypeFilter() === option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="card text-center py-12 text-sand-400">Chargement de l'historique...</div>
+  } @else if (logs().length === 0) {
+    <div class="card flex flex-col items-center justify-center py-16 text-center">
+      <div class="w-16 h-16 bg-sand-100 rounded-full flex items-center justify-center mb-4">
+        <app-icon name="clipboard" size="w-8 h-8 text-sand-300"></app-icon>
+      </div>
+      <p class="text-sand-500">Aucune opération trouvée</p>
+    </div>
+  } @else {
+    <div class="card" style="padding: 0;">
+      <ul class="divide-y divide-sand-200">
+        @for (log of logs(); track log.id) {
+          <li class="px-4 py-3">
+            <button
+              type="button"
+              class="w-full flex items-center gap-3 text-left"
+              (click)="toggleExpand(log.id)"
+            >
+              <span class="status-badge shrink-0"
+                    [class]="actionVariant(log.action)">
+                {{ actionLabel(log.action) }}
+              </span>
+              <!-- LIGNE MODIFIÉE -->
+              <span class="text-sm text-sand-700 flex-1">
+                <strong>{{ entityLabel(log.entityType) }}</strong> — {{ rowTitle(log) }}
+                <span class="text-sand-400"> · par {{ log.username }}</span>
+              </span>
+              <span class="text-xs text-sand-500 shrink-0">{{ log.actionDate | date: 'dd/MM/yyyy HH:mm' }}</span>
+              <app-icon
+                [name]="expandedRowId() === log.id ? 'chevron-up' : 'chevron-down'"
+                size="w-4 h-4"
+                class="text-sand-400 shrink-0"
+              ></app-icon>
+            </button>
+
+            @if (expandedRowId() === log.id) {
+              <div class="mt-3 ml-2 pl-4 border-l-2 border-sand-200 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
+                <!-- BOUCLE MODIFIÉE : utilisation de field.label -->
+                @for (field of parseDetails(log.details); track field.label) {
+                  <div class="text-xs">
+                    <span class="text-sand-500">{{ field.label }} : </span>
+                    <span class="text-sand-700">{{ field.value }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex items-center justify-between text-sm text-sand-600">
+      <span>{{ totalElements() }} opération(s) au total</span>
+      <div class="flex items-center gap-2">
+        <button type="button" class="btn-secondary text-sm" [disabled]="isFirst()" (click)="onPreviousPage()">
+          <app-icon name="chevron-left" size="w-4 h-4"></app-icon>
+          Précédent
+        </button>
+        <span>Page {{ page() + 1 }} sur {{ totalPages() || 1 }}</span>
+        <button type="button" class="btn-secondary text-sm" [disabled]="isLast()" (click)="onNextPage()">
+          Suivant
+          <app-icon name="chevron-right" size="w-4 h-4"></app-icon>
+        </button>
+      </div>
+    </div>
+  }
+</div>

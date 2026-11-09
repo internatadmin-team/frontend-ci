@@ -1,0 +1,170 @@
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold text-sand-800 font-[family-name:var(--font-display)]">Paiements</h1>
+    <p class="text-sand-500 text-sm mt-1">Suivi des paiements des élèves et des salaires du personnel</p>
+  </div>
+
+  <!-- Onglets principaux -->
+  <div class="flex gap-2">
+    <button
+      type="button"
+      class="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+      [class]="mainTab() === 'eleves' ? 'bg-sage-500 text-white' : 'bg-sand-50 text-sand-600 border border-sand-200 hover:bg-sand-100'"
+      (click)="onMainTabChange('eleves')"
+    >
+      Élèves
+    </button>
+    <button
+      type="button"
+      class="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+      [class]="mainTab() === 'salaires' ? 'bg-sage-500 text-white' : 'bg-sand-50 text-sand-600 border border-sand-200 hover:bg-sand-100'"
+      (click)="onMainTabChange('salaires')"
+    >
+      Salaires du personnel
+    </button>
+  </div>
+
+  <!-- Filtres période + statut -->
+  <div class="card flex flex-wrap items-end gap-4">
+    @if (mainTab() === 'salaires' || (mainTab() === 'eleves' && eleveSubTab() === 'mensualites')) {
+      <div>
+        <label class="form-label">Année</label>
+        <input
+          type="number"
+          class="input-field"
+          style="width: 8rem;"
+          [value]="year()"
+          (input)="onYearChange($any($event.target).valueAsNumber)"
+        >
+      </div>
+      <div>
+        <label class="form-label">Mois</label>
+        <select class="input-field" style="width: 10rem;" (change)="onMonthChange(+$any($event.target).value)">
+            @for (m of moisOptions; track m.value) {
+            <option [value]="m.value" [selected]="m.value === month()">{{ m.label }}</option>
+            }
+        </select>
+    </div>
+    }
+   <div>
+    <label class="form-label">Statut</label>
+    <select class="input-field" style="width: 10rem;" (change)="onStatusFilterChange($any($event.target).value)">
+        <option value="ALL" [selected]="statusFilter() === 'ALL'">Tous</option>
+        <option value="PAYE" [selected]="statusFilter() === 'PAYE'">Payé</option>
+        <option value="IMPAYE" [selected]="statusFilter() === 'IMPAYE'">Impayé</option>
+        <option value="PARTIEL" [selected]="statusFilter() === 'PARTIEL'">Partiel</option>
+    </select>
+    </div>
+  </div>
+
+  <!-- Contenu : Élèves -->
+  @if (mainTab() === 'eleves') {
+    <div class="flex gap-2">
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+        [class]="eleveSubTab() === 'mensualites' ? 'bg-sand-200 text-sand-800' : 'text-sand-500 hover:bg-sand-100'"
+        (click)="onEleveSubTabChange('mensualites')"
+      >
+        Mensualités
+      </button>
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+        [class]="eleveSubTab() === 'inscriptions' ? 'bg-sand-200 text-sand-800' : 'text-sand-500 hover:bg-sand-100'"
+        (click)="onEleveSubTabChange('inscriptions')"
+      >
+        Inscriptions
+      </button>
+    </div>
+
+    @if (eleveSubTab() === 'mensualites') {
+      @for (k of [refreshKey()]; track k) {
+        <app-suivi-mensualites
+          [year]="year()"
+          [month]="month()"
+          [statusFilter]="statusFilter()"
+          (payRequested)="onPayMensualite($event)"
+          (receiptRequested)="onReceiptEleve($event)"
+        ></app-suivi-mensualites>
+      }
+    } @else {
+      @for (k of [refreshKey()]; track k) {
+        <app-suivi-inscriptions
+          [statusFilter]="statusFilter()"
+          (payRequested)="onPayInscription($event)"
+          (receiptRequested)="onReceiptEleve($event)"
+        ></app-suivi-inscriptions>
+      }
+    }
+  }
+
+  <!-- Contenu : Salaires -->
+  @if (mainTab() === 'salaires') {
+    @for (k of [refreshKey()]; track k) {
+      <app-suivi-salaires
+        [year]="year()"
+        [month]="month()"
+        [statusFilter]="statusFilter()"
+        (payRequested)="onPaySalaire($event)"
+        (receiptRequested)="onReceiptSalaire($event)"
+      ></app-suivi-salaires>
+    }
+  }
+</div>
+
+<!-- Modale paiement élève -->
+<app-modal
+  [open]="showPaiementEnfantModal()"
+  title="Enregistrer un paiement élève"
+  maxWidth="36rem"
+  (closed)="showPaiementEnfantModal.set(false)"
+>
+  @if (showPaiementEnfantModal()) {
+    <app-paiement-enfant-form
+    [prefillEnfantId]="prefillEnfantId()"
+    [prefillPaymentType]="prefillPaymentType()"
+    [prefillYear]="year()"
+    [prefillMonth]="month()"
+    [prefillAmount]="prefillAmount()"
+    [prefillExpectedAmount]="prefillExpectedAmount()"
+    (saved)="onPaiementEnfantSaved()"
+    (cancelled)="showPaiementEnfantModal.set(false)"
+    ></app-paiement-enfant-form>
+  }
+</app-modal>
+
+<!-- Modale paiement salaire -->
+<app-modal
+  [open]="showPaiementSalaireModal()"
+  title="Enregistrer un paiement de salaire"
+  maxWidth="36rem"
+  (closed)="showPaiementSalaireModal.set(false)"
+>
+  @if (showPaiementSalaireModal()) {
+    <app-paiement-salaire-form
+      [prefillEmployeId]="prefillEmployeId()"
+      [prefillYear]="year()"
+      [prefillMonth]="month()"
+      (saved)="onPaiementSalaireSaved()"
+      (cancelled)="showPaiementSalaireModal.set(false)"
+    ></app-paiement-salaire-form>
+  }
+</app-modal>
+
+<!-- Modale reçu -->
+<app-modal
+  [open]="showRecuModal()"
+  title="Reçu de paiement"
+  maxWidth="30rem"
+  (closed)="onRecuClosed()"
+>
+  @if (showRecuModal()) {
+    <app-paiement-recu
+      [kind]="recuKind()"
+      [recuEleve]="recuEleve()"
+      [recuSalaire]="recuSalaire()"
+      (closed)="onRecuClosed()"
+    ></app-paiement-recu>
+  }
+</app-modal>

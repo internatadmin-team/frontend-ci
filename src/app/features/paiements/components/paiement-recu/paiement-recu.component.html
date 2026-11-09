@@ -1,0 +1,66 @@
+@if (kind() === 'eleve' && recuEleve(); as recu) {
+  <div class="print-only" style="padding: 2rem;">
+    <app-print-header></app-print-header>
+    <div style="border: 1px solid #E8E0D5; border-radius: 12px; overflow: hidden; margin-top: 1rem;">
+      <div style="background: #5B8A72; color: white; padding: 0.75rem 1.25rem;">
+        <p style="font-weight: 700; font-family: 'Poppins', sans-serif; margin: 0;">Reçu de paiement</p>
+      </div>
+      <div style="padding: 1.25rem;">
+        <p style="font-weight: 700; font-size: 1rem; color: #3D3229; margin: 0 0 0.25rem;">{{ recu.enfantFullName }}</p>
+        <p style="font-size: 0.75rem; color: #7A6F65; font-family: monospace; margin: 0 0 1rem;">{{ recu.enfantMatricule }}</p>
+        <table style="width: 100%; font-size: 0.85rem; border-collapse: collapse;">
+          <tr><td style="padding: 4px 0; color: #7A6F65;">Tuteur</td><td style="padding: 4px 0; text-align: right; font-weight: 600; color: #3D3229;">{{ recu.guardianName }}</td></tr>
+          <tr><td style="padding: 4px 0; color: #7A6F65;">Type</td><td style="padding: 4px 0; text-align: right; font-weight: 600; color: #3D3229;">{{ typeLabel(recu.paymentType) }}</td></tr>
+          <tr><td style="padding: 4px 0; color: #7A6F65;">Moyen de paiement</td><td style="padding: 4px 0; text-align: right; font-weight: 600; color: #3D3229;">{{ methodLabel(recu.paymentMethod) }}</td></tr>
+          <tr><td style="padding: 4px 0; color: #7A6F65;">Date</td><td style="padding: 4px 0; text-align: right; font-weight: 600; color: #3D3229;">{{ recu.paymentDate }}</td></tr>
+          <tr style="border-top: 1px solid #E8E0D5;">
+            <td style="padding: 8px 0; color: #3D3229; font-weight: 700;">Montant</td>
+            <td style="padding: 8px 0; text-align: right; font-weight: 700; color: #4F8A5B; font-size: 1.05rem;">{{ recu.amount }} FCFA</td>
+          </tr>
+          <tr><td style="padding: 4px 0; color: #7A6F65;">Solde après paiement</td><td style="padding: 4px 0; text-align: right; font-weight: 600; color: #3D3229;">{{ recu.balanceAfter }} FCFA</td></tr>
+        </table>
+        @if (recu.isPartial) {
+          <p style="margin-top: 0.75rem; font-size: 0.75rem; color: #B8704B;">⚠ Paiement partiel</p>
+        }
+      </div>
+      <div style="background: #F5F0E8; padding: 0.5rem 1.25rem; font-size: 0.7rem; color: #9C8B6E;">
+        Enregistré par {{ recu.registeredByUsername }}
+      </div>
+    </div>
+  </div>
+}
+
+@if (kind() === 'salaire' && recuSalaire(); as recu) {
+  <div class="print-only" style="padding: 2rem;">
+    <app-print-header></app-print-header>
+    <div style="border: 1px solid #E8E0D5; border-radius: 12px; overflow: hidden; margin-top: 1rem;">
+      <div style="background: #4A6B7C; color: white; padding: 0.75rem 1.25rem;">
+        <p style="font-weight: 700; font-family: 'Poppins', sans-serif; margin: 0;">Reçu de paiement de salaire</p>
+      </div>
+      <div style="padding: 1.25rem;">
+        <p style="font-weight: 700; font-size: 1rem; color: #3D3229; margin: 0 0 0.25rem;">{{ recu.employeFullName }}</p>
+        <p style="font-size: 0.75rem; color: #7A6F65; font-family: monospace; margin: 0 0 1rem;">{{ recu.employeMatricule }}</p>
+        <table style="width: 100%; font-size: 0.85rem; border-collapse: collapse;">
+          <tr><td style="padding: 4px 0; color: #7A6F65;">Fonction</td><td style="padding: 4px 0; text-align: right; font-weight: 600; color: #3D3229;">{{ recu.employeFunction }}</td></tr>
+          <tr><td style="padding: 4px 0; color: #7A6F65;">Moyen de paiement</td><td style="padding: 4px 0; text-align: right; font-weight: 600; color: #3D3229;">{{ methodLabel(recu.paymentMethod) }}</td></tr>
+          <tr><td style="padding: 4px 0; color: #7A6F65;">Date</td><td style="padding: 4px 0; text-align: right; font-weight: 600; color: #3D3229;">{{ recu.paymentDate }}</td></tr>
+          <tr style="border-top: 1px solid #E8E0D5;">
+            <td style="padding: 8px 0; color: #3D3229; font-weight: 700;">Montant</td>
+            <td style="padding: 8px 0; text-align: right; font-weight: 700; color: #4F8A5B; font-size: 1.05rem;">{{ recu.amount }} FCFA</td>
+          </tr>
+        </table>
+      </div>
+      <div style="background: #F5F0E8; padding: 0.5rem 1.25rem; font-size: 0.7rem; color: #9C8B6E;">
+        Enregistré par {{ recu.registeredByUsername }}
+      </div>
+    </div>
+  </div>
+}
+
+<div class="flex justify-end gap-3 pt-4 border-t border-sand-200 mt-4 no-print">
+  <button type="button" class="btn-secondary" (click)="onClose()">Fermer</button>
+  <button type="button" class="btn-primary" (click)="onPrint()">
+    <app-icon name="download" size="w-4 h-4"></app-icon>
+    Imprimer
+  </button>
+</div>

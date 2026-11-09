@@ -1,0 +1,33 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+
+  <div>
+    <label class="form-label">Source de la recette</label>
+    <input type="text" formControlName="source" class="input-field" [class.error]="submitted() && form.get('source')?.invalid" placeholder="Ex: Don, subvention...">
+    @if (submitted() && form.get('source')?.invalid) {
+      <span class="form-error">La source est requise</span>
+    }
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="form-label">Montant (FCFA)</label>
+      <input type="number" formControlName="amount" class="input-field" min="0">
+    </div>
+    <div>
+      <label class="form-label">Date de la recette</label>
+      <input type="date" formControlName="recetteDate" class="input-field">
+    </div>
+  </div>
+
+  <div>
+    <label class="form-label">Description (optionnel)</label>
+    <input type="text" formControlName="description" class="input-field">
+  </div>
+
+  <div class="flex justify-end gap-3 pt-2">
+    <button type="button" class="btn-secondary" (click)="onCancel()">Annuler</button>
+    <button type="submit" class="btn-primary" [disabled]="loading()">
+      {{ loading() ? 'Enregistrement...' : 'Enregistrer la recette' }}
+    </button>
+  </div>
+</form>

@@ -1,0 +1,59 @@
+@if (loading()) {
+  <div class="card text-center py-12 text-sand-400">Chargement de la trésorerie...</div>
+} @else if (data(); as t) {
+  <div class="space-y-6">
+    <!-- Résumé -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="stat-card">
+        <div class="stat-icon green"><app-icon name="trending-up" size="w-5 h-5"></app-icon></div>
+        <p class="stat-value">{{ formatFcfa(t.totalRecettes) }}</p>
+        <p class="stat-label">Total recettes</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange"><app-icon name="trending-down" size="w-5 h-5"></app-icon></div>
+        <p class="stat-value">{{ formatFcfa(t.totalDepenses) }}</p>
+        <p class="stat-label">Total dépenses</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue"><app-icon name="wallet" size="w-5 h-5"></app-icon></div>
+        <p class="stat-value">{{ formatFcfa(t.solde) }}</p>
+        <p class="stat-label">Solde du mois</p>
+      </div>
+    </div>
+
+    <!-- Détail recettes / dépenses -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="card">
+        <h3 class="text-lg font-semibold text-sand-800 mb-4">Détail des recettes</h3>
+        @if (t.detailRecettes.length === 0) {
+          <p class="text-sand-400 text-sm text-center py-6">Aucune recette ce mois-ci</p>
+        } @else {
+          <ul class="divide-y divide-sand-200">
+            @for (ligne of t.detailRecettes; track ligne.source) {
+              <li class="flex items-center justify-between py-2 text-sm">
+                <span class="text-sand-700">{{ ligne.source }}</span>
+                <span class="font-medium text-sage-600">{{ formatFcfa(ligne.montant) }}</span>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <div class="card">
+        <h3 class="text-lg font-semibold text-sand-800 mb-4">Détail des dépenses</h3>
+        @if (t.detailDepenses.length === 0) {
+          <p class="text-sand-400 text-sm text-center py-6">Aucune dépense ce mois-ci</p>
+        } @else {
+          <ul class="divide-y divide-sand-200">
+            @for (ligne of t.detailDepenses; track ligne.source) {
+              <li class="flex items-center justify-between py-2 text-sm">
+                <span class="text-sand-700">{{ ligne.source }}</span>
+                <span class="font-medium text-terracotta-600">{{ formatFcfa(ligne.montant) }}</span>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  </div>
+}

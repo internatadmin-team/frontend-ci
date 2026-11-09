@@ -56,7 +56,7 @@ export class LoginComponent {
         if (response.mustChangePassword) {
           this.router.navigate(['/change-password'], { replaceUrl: true });
         } else {
-          this.router.navigate(['/eleves'], { replaceUrl: true });
+          this.router.navigate(['/dashboard'], { replaceUrl: true });
         }
       },
       error: (err) => {

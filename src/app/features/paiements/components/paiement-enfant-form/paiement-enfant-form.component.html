@@ -1,0 +1,77 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+
+  @if (submitted() && form.errors?.['futureMonth']) {
+    <div class="form-error" style="margin-bottom: 0.5rem;">
+      Impossible d'enregistrer une mensualité pour un mois qui n'est pas encore arrivé.
+    </div>
+  }
+
+  <div>
+    <label class="form-label">Élève</label>
+    <select formControlName="enfantId" class="input-field" [class.error]="submitted() && form.get('enfantId')?.invalid">
+      <option [ngValue]="null">Sélectionner un élève</option>
+      @for (enfant of enfants(); track enfant.id) {
+        <option [ngValue]="enfant.id">{{ enfant.fullName }} ({{ enfant.matricule }})</option>
+      }
+    </select>
+    @if (submitted() && form.get('enfantId')?.invalid) {
+      <span class="form-error">Veuillez sélectionner un élève</span>
+    }
+  </div>
+
+  <div>
+    <label class="form-label">Type de paiement</label>
+    <select formControlName="paymentType" class="input-field">
+      @for (option of paymentTypeOptions; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+  </div>
+
+  @if (isMensualite) {
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="form-label">Année concernée</label>
+        <input type="number" formControlName="concernedYear" class="input-field" min="2000" [max]="currentYear">
+      </div>
+      <div>
+        <label class="form-label">Mois concerné</label>
+        <select formControlName="concernedMonth" class="input-field">
+          @for (m of [1,2,3,4,5,6,7,8,9,10,11,12]; track m) {
+            <option [value]="m" [disabled]="m > maxSelectableMonth">{{ m }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  }
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="form-label">Montant (FCFA)</label>
+      <input type="number" formControlName="amount" class="input-field" min="0">
+      @if (isAmountLocked) {
+        <span class="text-xs text-sand-500">Montant fixe, non modifiable</span>
+      }
+    </div>
+    <div>
+      <label class="form-label">Moyen de paiement</label>
+      <select formControlName="paymentMethod" class="input-field">
+        @for (option of paymentMethodOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div>
+    <label class="form-label">Date de paiement</label>
+    <input type="date" formControlName="paymentDate" class="input-field">
+  </div>
+
+  <div class="flex justify-end gap-3 pt-2">
+    <button type="button" class="btn-secondary" (click)="onCancel()">Annuler</button>
+    <button type="submit" class="btn-primary" [disabled]="loading()">
+      {{ loading() ? 'Enregistrement...' : 'Enregistrer le paiement' }}
+    </button>
+  </div>
+</form>

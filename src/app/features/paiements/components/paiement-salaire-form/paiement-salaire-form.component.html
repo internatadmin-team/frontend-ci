@@ -1,0 +1,58 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+
+  @if (submitted() && form.errors?.['futureMonth']) {
+    <div class="form-error" style="margin-bottom: 0.5rem;">
+      Impossible d'enregistrer un salaire pour un mois qui n'est pas encore arrivé.
+    </div>
+  }
+
+  <div>
+    <label class="form-label">Employé</label>
+    <select formControlName="employeId" class="input-field" [class.error]="submitted() && form.get('employeId')?.invalid">
+      <option [ngValue]="null">Sélectionner un employé</option>
+      @for (employe of employes(); track employe.id) {
+        <option [ngValue]="employe.id">{{ employe.fullName }} ({{ employe.matricule }})</option>
+      }
+    </select>
+    @if (submitted() && form.get('employeId')?.invalid) {
+      <span class="form-error">Veuillez sélectionner un employé</span>
+    }
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="form-label">Année</label>
+      <input type="number" formControlName="concernedYear" class="input-field" min="2000" [max]="currentYear">
+    </div>
+    <div>
+      <label class="form-label">Mois</label>
+      <select formControlName="concernedMonth" class="input-field">
+        @for (m of [1,2,3,4,5,6,7,8,9,10,11,12]; track m) {
+          <option [value]="m" [disabled]="m > maxSelectableMonth">{{ m }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="form-label">Moyen de paiement</label>
+      <select formControlName="paymentMethod" class="input-field">
+        @for (option of paymentMethodOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+    <div>
+      <label class="form-label">Date de paiement</label>
+      <input type="date" formControlName="paymentDate" class="input-field">
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-3 pt-2">
+    <button type="button" class="btn-secondary" (click)="onCancel()">Annuler</button>
+    <button type="submit" class="btn-primary" [disabled]="loading()">
+      {{ loading() ? 'Enregistrement...' : 'Enregistrer le paiement' }}
+    </button>
+  </div>
+</form>
