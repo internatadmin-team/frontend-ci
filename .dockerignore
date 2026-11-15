@@ -1,0 +1,16 @@
+# Liste blanche : seul ce qui sert au build de l'image est envoye au demon Docker.
+*
+
+!package.json
+!package-lock.json
+!angular.json
+!tsconfig.json
+!tsconfig.app.json
+!.postcssrc.json
+!nginx.conf
+!public/
+!src/
+
+# Tests (non compiles dans l'image) et fichiers systeme
+**/*.spec.ts
+**/.DS_Store

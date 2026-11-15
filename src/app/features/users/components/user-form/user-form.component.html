@@ -1,0 +1,31 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+
+  <div>
+    <label class="form-label">Prénom</label>
+    <input type="text" formControlName="firstName" class="input-field" [class.error]="submitted() && form.get('firstName')?.invalid">
+    @if (submitted() && form.get('firstName')?.invalid) {
+      <span class="form-error">Le prénom est requis</span>
+    }
+  </div>
+
+  <div>
+    <label class="form-label">Nom</label>
+    <input type="text" formControlName="lastName" class="input-field" [class.error]="submitted() && form.get('lastName')?.invalid">
+    @if (submitted() && form.get('lastName')?.invalid) {
+      <span class="form-error">Le nom est requis</span>
+    }
+  </div>
+
+  @if (!isEditMode) {
+    <p class="text-xs text-sand-500">
+      Un nom d'utilisateur et un mot de passe temporaire seront générés automatiquement pour ce compte gestionnaire.
+    </p>
+  }
+
+  <div class="flex justify-end gap-3 pt-2">
+    <button type="button" class="btn-secondary" (click)="onCancel()">Annuler</button>
+    <button type="submit" class="btn-primary" [disabled]="loading()">
+      {{ loading() ? 'Enregistrement...' : (isEditMode ? 'Enregistrer les modifications' : 'Créer le compte') }}
+    </button>
+  </div>
+</form>

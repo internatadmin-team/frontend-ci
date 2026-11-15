@@ -1,0 +1,124 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <div>
+      <h1 class="text-2xl font-bold text-sand-800 font-[family-name:var(--font-display)]">Finances</h1>
+      <p class="text-sand-500 text-sm mt-1">Dépenses, autres recettes et trésorerie de l'internat</p>
+    </div>
+    @if (mainTab() === 'depenses') {
+      <div class="flex gap-2">
+        <button type="button" class="btn-secondary" (click)="showCategoriesModal.set(true)">
+          <app-icon name="settings" size="w-4 h-4"></app-icon>
+          Catégories
+        </button>
+        <button type="button" class="btn-primary" (click)="showDepenseModal.set(true)">
+          <app-icon name="plus" size="w-4 h-4"></app-icon>
+          Nouvelle dépense
+        </button>
+      </div>
+    }
+    @if (mainTab() === 'recettes') {
+      <button type="button" class="btn-primary" (click)="showRecetteModal.set(true)">
+        <app-icon name="plus" size="w-4 h-4"></app-icon>
+        Nouvelle recette
+      </button>
+    }
+  </div>
+
+  <!-- Onglets -->
+ <div class="flex gap-2">
+  <button
+    type="button"
+    class="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+    [class]="mainTab() === 'tresorerie' ? 'bg-sage-500 text-white' : 'bg-sand-50 text-sand-600 border border-sand-200 hover:bg-sand-100'"
+    (click)="onMainTabChange('tresorerie')"
+  >
+    Trésorerie
+  </button>
+  <button
+    type="button"
+    class="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+    [class]="mainTab() === 'depenses' ? 'bg-sage-500 text-white' : 'bg-sand-50 text-sand-600 border border-sand-200 hover:bg-sand-100'"
+    (click)="onMainTabChange('depenses')"
+  >
+    Dépenses
+  </button>
+  <button
+    type="button"
+    class="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+    [class]="mainTab() === 'recettes' ? 'bg-sage-500 text-white' : 'bg-sand-50 text-sand-600 border border-sand-200 hover:bg-sand-100'"
+    (click)="onMainTabChange('recettes')"
+  >
+    Autres recettes
+  </button>
+</div>
+
+  <!-- Filtre période -->
+  <div class="card flex flex-wrap items-end gap-4">
+    <div>
+      <label class="form-label">Année</label>
+      <input
+        type="number"
+        class="input-field"
+        style="width: 8rem;"
+        [value]="year()"
+        (input)="onYearChange($any($event.target).valueAsNumber)"
+      >
+    </div>
+    <div>
+      <label class="form-label">Mois</label>
+      <select class="input-field" style="width: 10rem;" (change)="onMonthChange(+$any($event.target).value)">
+        @for (m of moisOptions; track m.value) {
+          <option [value]="m.value" [selected]="m.value === month()">{{ m.label }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- Contenu -->
+  @if (mainTab() === 'depenses') {
+    @for (k of [refreshKey()]; track k) {
+      <app-depenses-list [year]="year()" [month]="month()" (receiptRequested)="onDepenseReceipt($event)"></app-depenses-list>
+    }
+  }
+  @if (mainTab() === 'recettes') {
+    @for (k of [refreshKey()]; track k) {
+      <app-recettes-list [year]="year()" [month]="month()" (receiptRequested)="onRecetteReceipt($event)"></app-recettes-list>
+    }
+  }
+  @if (mainTab() === 'tresorerie') {
+    <app-tresorerie-view [year]="year()" [month]="month()"></app-tresorerie-view>
+  }
+</div>
+
+<!-- Modale nouvelle dépense -->
+<app-modal [open]="showDepenseModal()" title="Nouvelle dépense" maxWidth="36rem" (closed)="showDepenseModal.set(false)">
+  @if (showDepenseModal()) {
+    <app-depense-form (saved)="onDepenseSaved()" (cancelled)="showDepenseModal.set(false)"></app-depense-form>
+  }
+</app-modal>
+
+<!-- Modale catégories -->
+<app-modal [open]="showCategoriesModal()" title="Catégories de dépenses" maxWidth="32rem" (closed)="showCategoriesModal.set(false)">
+  @if (showCategoriesModal()) {
+    <app-categories-depenses-modal></app-categories-depenses-modal>
+  }
+</app-modal>
+
+<!-- Modale nouvelle recette -->
+<app-modal [open]="showRecetteModal()" title="Nouvelle recette" maxWidth="36rem" (closed)="showRecetteModal.set(false)">
+  @if (showRecetteModal()) {
+    <app-recette-form (saved)="onRecetteSaved()" (cancelled)="showRecetteModal.set(false)"></app-recette-form>
+  }
+</app-modal>
+
+<!-- Modale reçu -->
+<app-modal [open]="showRecuModal()" title="Reçu" maxWidth="30rem" (closed)="onRecuClosed()">
+  @if (showRecuModal()) {
+    <app-finance-recu
+      [kind]="recuKind()"
+      [depense]="recuDepense()"
+      [recette]="recuRecette()"
+      (closed)="onRecuClosed()"
+    ></app-finance-recu>
+  }
+</app-modal>

@@ -1,0 +1,38 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+
+  <div>
+    <label class="form-label">Catégorie</label>
+    <select formControlName="categorieId" class="input-field" [class.error]="submitted() && form.get('categorieId')?.invalid">
+      <option [ngValue]="null">Sélectionner une catégorie</option>
+      @for (cat of categories(); track cat.id) {
+        <option [ngValue]="cat.id">{{ cat.name }}</option>
+      }
+    </select>
+    @if (submitted() && form.get('categorieId')?.invalid) {
+      <span class="form-error">Veuillez sélectionner une catégorie</span>
+    }
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="form-label">Montant (FCFA)</label>
+      <input type="number" formControlName="amount" class="input-field" min="0">
+    </div>
+    <div>
+      <label class="form-label">Date de la dépense</label>
+      <input type="date" formControlName="expenseDate" class="input-field">
+    </div>
+  </div>
+
+  <div>
+    <label class="form-label">Description (optionnel)</label>
+    <input type="text" formControlName="description" class="input-field">
+  </div>
+
+  <div class="flex justify-end gap-3 pt-2">
+    <button type="button" class="btn-secondary" (click)="onCancel()">Annuler</button>
+    <button type="submit" class="btn-primary" [disabled]="loading()">
+      {{ loading() ? 'Enregistrement...' : 'Enregistrer la dépense' }}
+    </button>
+  </div>
+</form>

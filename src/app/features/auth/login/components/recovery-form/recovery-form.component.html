@@ -1,0 +1,99 @@
+@if (newRecoveryCode) {
+  <!-- AFFICHAGE NOUVEAU CODE -->
+  <div style="text-align: center;">
+    <div style="background: rgba(91, 138, 114, 0.2); border: 1px solid rgba(91, 138, 114, 0.4); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem;">
+      <p style="color: rgba(255,255,255,0.8); font-size: 0.875rem; margin-bottom: 0.5rem;">Votre nouveau code de recuperation</p>
+      <p style="color: #C4A35A; font-size: 1.5rem; font-weight: 700; font-family: monospace; letter-spacing: 0.1em;">{{ newRecoveryCode }}</p>
+      <p style="color: rgba(255,255,255,0.5); font-size: 0.75rem; margin-top: 0.5rem;">
+        Notez ce code immediatement. Il ne sera plus jamais affiche.
+      </p>
+    </div>
+    <button
+      (click)="onContinue()"
+      style="width: 100%; padding: 0.875rem 1rem; background-color: #C4A35A; color: white; font-weight: 600; font-size: 1rem; border-radius: 0.75rem; border: none; cursor: pointer;"
+    >
+      J'ai note mon code - Continuer
+    </button>
+  </div>
+} @else {
+  <!-- FORMULAIRE -->
+  <form [formGroup]="recoveryForm" (ngSubmit)="onSubmit()" style="display: flex; flex-direction: column; gap: 1rem;">
+    
+    @if (errorMessage) {
+      <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border-radius: 0.75rem; background: rgba(138, 74, 62, 0.2); border: 1px solid rgba(166, 93, 77, 0.3); color: #D4A098; font-size: 0.875rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div style="display: flex; flex-direction: column; gap: 0.375rem;">
+      <label style="font-size: 0.875rem; font-weight: 500; color: rgba(255,255,255,0.8);">Nom d'utilisateur</label>
+      <input
+        type="text"
+        formControlName="username"
+        placeholder="Votre identifiant"
+        style="width: 100%; padding: 0.75rem 1rem; border-radius: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 1rem; outline: none;"
+        [style.border-color]="submitted && username?.invalid ? '#A65D4D' : 'rgba(255,255,255,0.2)'"
+      >
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.375rem;">
+      <label style="font-size: 0.875rem; font-weight: 500; color: rgba(255,255,255,0.8);">Code de recuperation</label>
+      <input
+        type="text"
+        formControlName="recoveryCode"
+        placeholder="Le code que vous avez note"
+        style="width: 100%; padding: 0.75rem 1rem; border-radius: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 1rem; outline: none; font-family: monospace; letter-spacing: 0.05em;"
+        [style.border-color]="submitted && recoveryCode?.invalid ? '#A65D4D' : 'rgba(255,255,255,0.2)'"
+      >
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.375rem;">
+      <label style="font-size: 0.875rem; font-weight: 500; color: rgba(255,255,255,0.8);">Nouveau mot de passe</label>
+      <input
+        type="password"
+        formControlName="newPassword"
+        placeholder="Minimum 8 caracteres"
+        style="width: 100%; padding: 0.75rem 1rem; border-radius: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 1rem; outline: none;"
+        [style.border-color]="submitted && newPassword?.invalid ? '#A65D4D' : 'rgba(255,255,255,0.2)'"
+      >
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.375rem;">
+      <label style="font-size: 0.875rem; font-weight: 500; color: rgba(255,255,255,0.8);">Confirmer le mot de passe</label>
+      <input
+        type="password"
+        formControlName="confirmPassword"
+        placeholder="Repeter le nouveau mot de passe"
+        style="width: 100%; padding: 0.75rem 1rem; border-radius: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 1rem; outline: none;"
+        [style.border-color]="submitted && (!passwordsMatch || confirmPassword?.invalid) ? '#A65D4D' : 'rgba(255,255,255,0.2)'"
+      >
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="loading"
+      style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.875rem 1rem; background-color: #C4A35A; color: white; font-weight: 600; font-size: 1rem; border-radius: 0.75rem; border: none; cursor: pointer; transition: all 0.2s;"
+      [style.opacity]="loading ? '0.6' : '1'"
+      [style.cursor]="loading ? 'not-allowed' : 'pointer'"
+    >
+      @if (loading) {
+        <span>Reinitialisation en cours...</span>
+      } @else {
+        <span>Reinitialiser le mot de passe</span>
+      }
+    </button>
+
+    <button
+      type="button"
+      (click)="back.emit()"
+      style="width: 100%; padding: 0.75rem 1rem; background: transparent; color: rgba(255,255,255,0.6); font-size: 0.875rem; border: none; cursor: pointer; text-decoration: underline;"
+    >
+      Retour a la connexion
+    </button>
+  </form>
+}

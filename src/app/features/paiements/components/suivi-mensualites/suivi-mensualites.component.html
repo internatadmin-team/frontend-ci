@@ -1,0 +1,40 @@
+@if (loading()) {
+  <div class="card text-center py-12 text-sand-400">Chargement du suivi des mensualités...</div>
+} @else {
+  <app-data-table
+    [columns]="columns"
+    [data]="data()"
+    exportFileName="suivi-mensualites"
+    emptyMessage="Aucun élève à afficher pour cette période"
+  >
+    <ng-template #actions let-row>
+      <div class="flex gap-1 justify-end">
+        @if (row.paiementIds.length > 0) {
+          <button
+            type="button"
+            class="p-2 rounded-lg text-sand-500 hover:bg-sand-100 transition-colors"
+            (click)="onReceipt(row)"
+            title="Voir le reçu"
+          >
+            <app-icon name="receipt" size="w-4 h-4"></app-icon>
+          </button>
+        }
+        @if (row.paiementIds.length === 1) {
+          <button
+            type="button"
+            class="p-2 rounded-lg text-earth-500 hover:bg-earth-50 transition-colors"
+            (click)="onCancelPaiement(row)"
+            title="Annuler le paiement"
+          >
+            <app-icon name="x" size="w-4 h-4"></app-icon>
+          </button>
+        }
+        @if (row.montantRestant > 0) {
+          <button type="button" class="btn-primary text-sm" (click)="onPay(row)">
+            Enregistrer un paiement
+          </button>
+        }
+      </div>
+    </ng-template>
+  </app-data-table>
+}

@@ -1,0 +1,124 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <div>
+      <h1 class="text-2xl font-bold text-sand-800 font-[family-name:var(--font-display)]">Utilisateurs</h1>
+      <p class="text-sand-500 text-sm mt-1">Gestion des comptes gestionnaires de l'application</p>
+    </div>
+    <button type="button" class="btn-primary" (click)="onAddClick()">
+      <app-icon name="plus" size="w-4 h-4"></app-icon>
+      Ajouter un utilisateur
+    </button>
+  </div>
+
+  <!-- Statistiques -->
+  @if (stats(); as s) {
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="stat-card">
+        <div class="stat-icon blue"><app-icon name="users" size="w-5 h-5"></app-icon></div>
+        <p class="stat-value">{{ s.totalUtilisateurs }}</p>
+        <p class="stat-label">Total comptes</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><app-icon name="check-circle" size="w-5 h-5"></app-icon></div>
+        <p class="stat-value">{{ s.totalActifs }}</p>
+        <p class="stat-label">Actifs</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange"><app-icon name="alert-circle" size="w-5 h-5"></app-icon></div>
+        <p class="stat-value">{{ s.totalDesactives }}</p>
+        <p class="stat-label">Désactivés</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon gold"><app-icon name="settings" size="w-5 h-5"></app-icon></div>
+        <p class="stat-value">{{ s.totalAdmins }}</p>
+        <p class="stat-label">Administrateurs</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue"><app-icon name="alert-triangle" size="w-5 h-5"></app-icon></div>
+        <p class="stat-value">{{ s.comptesEnAttenteChangementMdp }}</p>
+        <p class="stat-label">En attente de changement MDP</p>
+      </div>
+    </div>
+  }
+
+  <!-- Tableau -->
+  @if (loading()) {
+    <div class="card text-center py-12 text-sand-400">Chargement des utilisateurs...</div>
+  } @else {
+    <app-data-table
+      [columns]="columns()"
+      [data]="users()"
+      [defaultSortKey]="'id'"
+      [defaultSortDirection]="'desc'"
+      exportFileName="utilisateurs"
+      emptyMessage="Aucun utilisateur trouvé"
+      [exportable]="false"
+    >
+      <ng-template #actions let-row>
+        <div class="flex gap-1 justify-end items-center">
+          <app-status-badge [status]="row.active ? 'ACTIF' : 'SORTI'"></app-status-badge>
+          <button
+            type="button"
+            class="p-2 rounded-lg text-sand-500 hover:bg-sand-100 transition-colors"
+            (click)="onEditClick(row)"
+            title="Modifier"
+          >
+            <app-icon name="edit" size="w-4 h-4"></app-icon>
+          </button>
+          <button
+            type="button"
+            class="p-2 rounded-lg text-sand-500 hover:bg-sand-100 transition-colors"
+            (click)="onResetPassword(row)"
+            title="Réinitialiser le mot de passe"
+          >
+            <app-icon name="refresh" size="w-4 h-4"></app-icon>
+          </button>
+          <button
+            type="button"
+            class="p-2 rounded-lg transition-colors"
+            [class]="row.active ? 'text-earth-500 hover:bg-earth-50' : 'text-sage-600 hover:bg-sage-50'"
+            (click)="onToggleActive(row)"
+            [title]="row.active ? 'Désactiver' : 'Activer'"
+          >
+            <app-icon [name]="row.active ? 'x' : 'check'" size="w-4 h-4"></app-icon>
+          </button>
+        </div>
+      </ng-template>
+    </app-data-table>
+  }
+</div>
+
+<!-- Modale formulaire -->
+<app-modal
+  [open]="showFormModal()"
+  [title]="editingUser() ? 'Modifier un utilisateur' : 'Ajouter un utilisateur'"
+  maxWidth="32rem"
+  (closed)="showFormModal.set(false)"
+>
+  @if (showFormModal()) {
+    <app-user-form
+      [user]="editingUser()"
+      (saved)="onUserSaved()"
+      (created)="onUserCreated($event)"
+      (cancelled)="showFormModal.set(false)"
+    ></app-user-form>
+  }
+</app-modal>
+
+<!-- Modale identifiants générés -->
+<app-modal
+  [open]="showCredentialsModal()"
+  title="Identifiants du compte"
+  maxWidth="28rem"
+  (closed)="onCredentialsClosed()"
+>
+  @if (showCredentialsModal() && credentialsResult(); as result) {
+    <app-user-credentials-modal
+      [username]="result.username"
+      [temporaryPassword]="result.temporaryPassword"
+      [fullName]="result.fullName"
+      [willLogout]="isSelfPasswordReset()"
+      (closed)="onCredentialsClosed()"
+    ></app-user-credentials-modal>
+  }
+</app-modal>

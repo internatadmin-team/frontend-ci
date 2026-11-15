@@ -1,0 +1,100 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+
+  @if (submitted() && form.errors?.['birthInfoRequired']) {
+    <div class="form-error" style="margin-bottom: 0.5rem;">
+      Indiquez soit la date de naissance, soit un âge approximatif.
+    </div>
+  }
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="form-label">Prénom</label>
+      <input type="text" formControlName="firstName" class="input-field" [class.error]="submitted() && form.get('firstName')?.invalid">
+      @if (submitted() && form.get('firstName')?.invalid) {
+        <span class="form-error">Le prénom est requis</span>
+      }
+    </div>
+    <div>
+      <label class="form-label">Nom</label>
+      <input type="text" formControlName="lastName" class="input-field" [class.error]="submitted() && form.get('lastName')?.invalid">
+      @if (submitted() && form.get('lastName')?.invalid) {
+        <span class="form-error">Le nom est requis</span>
+      }
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="form-label">Date de naissance (optionnel)</label>
+      <input type="date" formControlName="birthDate" class="input-field">
+    </div>
+    <div>
+      <label class="form-label">Âge approximatif (optionnel)</label>
+      <input type="number" formControlName="approximateAge" class="input-field" min="0" max="30">
+    </div>
+  </div>
+
+  <div>
+    <label class="form-label">Genre</label>
+    <select formControlName="gender" class="input-field">
+      <option value="M">Garçon</option>
+      <option value="F">Fille</option>
+    </select>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="form-label">Nom du tuteur</label>
+      <input type="text" formControlName="guardianName" class="input-field" [class.error]="submitted() && form.get('guardianName')?.invalid">
+      @if (submitted() && form.get('guardianName')?.invalid) {
+        <span class="form-error">Le nom du tuteur est requis</span>
+      }
+    </div>
+    <div>
+      <label class="form-label">Téléphone du tuteur</label>
+      <input type="tel" formControlName="guardianPhone" class="input-field" [class.error]="submitted() && form.get('guardianPhone')?.invalid">
+      @if (submitted() && form.get('guardianPhone')?.invalid) {
+        <span class="form-error">Le téléphone du tuteur est requis</span>
+      }
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="form-label">Quartier (optionnel)</label>
+      <input type="text" formControlName="neighborhood" class="input-field">
+    </div>
+    <div>
+      <label class="form-label">Chambre / Groupe (optionnel)</label>
+      <input type="text" formControlName="roomGroup" class="input-field">
+    </div>
+  </div>
+
+  @if (!isEditMode) {
+    <div>
+      <label class="form-label">Date d'entrée</label>
+      <input type="date" formControlName="entryDate" class="input-field" [class.error]="submitted() && form.get('entryDate')?.invalid">
+      @if (submitted() && form.get('entryDate')?.invalid) {
+        <span class="form-error">La date d'entrée est requise</span>
+      }
+    </div>
+  }
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="form-label">Frais d'inscription (FCFA)</label>
+      <input type="number" formControlName="registrationFee" class="input-field" min="0">
+    </div>
+    <div>
+      <label class="form-label">Mensualité (FCFA)</label>
+      <input type="number" formControlName="monthlyFee" class="input-field" min="0">
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-3 pt-2">
+    <button type="button" class="btn-secondary" (click)="onCancel()">Annuler</button>
+    <button type="submit" class="btn-primary" [disabled]="loading()">
+      {{ loading() ? 'Enregistrement...' : (isEditMode ? 'Enregistrer les modifications' : 'Ajouter l\'élève') }}
+    </button>
+  </div>
+</form>

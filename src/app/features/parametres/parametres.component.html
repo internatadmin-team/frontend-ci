@@ -1,0 +1,72 @@
+<div class="space-y-6 max-w-2xl">
+  <div>
+    <h1 class="text-2xl font-bold text-sand-800 font-[family-name:var(--font-display)]">Paramètres de l'établissement</h1>
+    <p class="text-sand-500 text-sm mt-1">Coordonnées et logo affichés sur les documents et reçus</p>
+  </div>
+
+  @if (loading()) {
+    <div class="card text-center py-12 text-sand-400">Chargement des paramètres...</div>
+  } @else {
+    <!-- Logo -->
+    <div class="card">
+      <h3 class="text-lg font-semibold text-sand-800 mb-4">Logo</h3>
+      <div class="flex items-center gap-5">
+        <div class="w-20 h-20 rounded-xl bg-sand-100 border border-sand-200 flex items-center justify-center overflow-hidden shrink-0">
+          @if (logoSrc()) {
+            <img [src]="logoSrc()" alt="Logo de l'établissement" class="w-full h-full object-contain">
+          } @else {
+            <app-icon name="briefcase" size="w-8 h-8 text-sand-300"></app-icon>
+          }
+        </div>
+        <div>
+          <label class="btn-secondary text-sm cursor-pointer inline-flex">
+            <app-icon name="download" size="w-4 h-4"></app-icon>
+            {{ uploadingLogo() ? 'Envoi en cours...' : 'Changer le logo' }}
+            <input type="file" accept="image/*" class="hidden" (change)="onLogoSelected($event)" [disabled]="uploadingLogo()">
+          </label>
+          <p class="text-xs text-sand-500 mt-2">Format image (PNG, JPG). Utilisé sur les certificats, cartes et reçus.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coordonnées -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="card space-y-4">
+      <h3 class="text-lg font-semibold text-sand-800 mb-2">Coordonnées</h3>
+
+      <div>
+        <label class="form-label">Nom de l'établissement</label>
+        <input type="text" formControlName="name" class="input-field" [class.error]="form.get('name')?.invalid && form.get('name')?.touched">
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
+          <span class="form-error">Le nom est requis</span>
+        }
+      </div>
+
+      <div>
+        <label class="form-label">Adresse</label>
+        <input type="text" formControlName="address" class="input-field">
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Téléphone</label>
+          <input type="tel" formControlName="phone" class="input-field">
+        </div>
+        <div>
+          <label class="form-label">Email</label>
+          <input type="email" formControlName="email" class="input-field">
+        </div>
+      </div>
+
+      <div>
+        <label class="form-label">Nom du directeur</label>
+        <input type="text" formControlName="directorName" class="input-field">
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button type="submit" class="btn-primary" [disabled]="saving()">
+          {{ saving() ? 'Enregistrement...' : 'Enregistrer les paramètres' }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

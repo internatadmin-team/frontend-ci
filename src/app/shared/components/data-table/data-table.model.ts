@@ -1,0 +1,7 @@
+export interface DataTableColumn<T> {
+  key: keyof T | string;
+  label: string;
+  sortable?: boolean;
+  align?: 'left' | 'right' | 'center';
+  format?: (row: T) => string;
+}

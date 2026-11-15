@@ -1,0 +1,13 @@
+@if (open()) {
+  <div class="modal-overlay" (click)="onOverlayClick($event)">
+    <div class="modal-content" [style.max-width]="maxWidth()" (click)="$event.stopPropagation()">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-semibold text-sand-800 font-[family-name:var(--font-display)]">{{ title() }}</h3>
+        <button type="button" class="p-1.5 rounded-lg text-sand-500 hover:bg-sand-100 transition-colors" (click)="close()">
+          <app-icon name="x" size="w-5 h-5"></app-icon>
+        </button>
+      </div>
+      <ng-content></ng-content>
+    </div>
+  </div>
+}
