@@ -3,7 +3,8 @@
 // Prerequis de l'instance Jenkins :
 //   - agent portant le label MI_AG, lance directement sur le Mac (agent.jar) avec Docker Desktop ;
 //   - plugins : workflow-aggregator, credentials-binding, junit, github ;
-//   - credential dockerhub-credentials : utilisateur et jeton d'acces Docker Hub.
+//   - credential dockerhub-credentials : utilisateur et jeton d'acces Docker Hub ;
+//   - credential slack-webhook-url     : texte secret, optionnel, pour la notification Slack de fin de build.
 //
 // Node et Trivy tournent dans des conteneurs ephemeres : l'espace de travail y est monte au meme chemin que
 // sur l'hote, et le dossier persistant ~/.cache/internatadmin-ci de l'hote sert de HOME (TOOL_HOME) : le cache
@@ -39,11 +40,11 @@ pipeline {
     triggers {
         // webhook GitHub si Jenkins est joignable, sinon scrutation du depot
         githubPush()
-        pollSCM('H/5 * * * *')
+        pollSCM('H/1 * * * *')
     }
 
     parameters {
-        booleanParam(name: 'TRIGGER_DEPLOY', defaultValue: false, description: 'Declencher le job de deploiement apres le push')
+        booleanParam(name: 'TRIGGER_DEPLOY', defaultValue: true, description: 'Declencher le job de deploiement apres le push')
         string(name: 'DEPLOY_JOB', defaultValue: 'deployment-cd', description: 'Job Jenkins du depot deployment-cd')
     }
 
@@ -177,10 +178,24 @@ pipeline {
             }
         }
         success {
-            echo "Build reussi : commit ${env.GIT_SHA}, version ${VERSION}"
+            script { notify("Build frontend-ci reussi : commit ${env.GIT_SHA}, version ${VERSION}") }
         }
         failure {
-            echo 'Build en echec : voir le stage en rouge et les rapports archives'
+            script { notify("Build frontend-ci en echec : build #${env.BUILD_NUMBER}, voir ${env.BUILD_URL}") }
         }
+    }
+}
+
+// Notification Slack si le credential est configure, sinon seulement dans le journal Jenkins.
+def notify(String message) {
+    echo message
+    try {
+        withCredentials([string(credentialsId: 'slack-webhook-url', variable: 'SLACK_WEBHOOK_URL')]) {
+            writeFile file: 'slack-payload.json', text: "{\"text\": \"${message}\"}"
+            sh 'curl -fsS -X POST -H "Content-Type: application/json" --data-binary @slack-payload.json "$SLACK_WEBHOOK_URL" > /dev/null'
+            sh 'rm -f slack-payload.json'
+        }
+    } catch (ignored) {
+        echo 'Notification Slack non configuree (credential slack-webhook-url absent) : notification journalisee seulement.'
     }
 }
