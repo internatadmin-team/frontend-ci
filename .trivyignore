@@ -1,0 +1,8 @@
+
+# Exception temporaire - paquet Alpine "nginx" corrige (1.30.7-r0) pas encore publie au 2026-11-23.
+# CVE deja corrigees en amont (nginx core), en attente d'empaquetage Alpine. A retirer des que
+# `apk upgrade` recupere nginx >= 1.30.7-r0 (verifie avec `apk info nginx` dans le conteneur).
+CVE-2026-113425 exp:2026-11-30
+CVE-2026-121810 exp:2026-11-30
+CVE-2026-123007 exp:2026-11-30
+CVE-2026-123633 exp:2026-11-30
